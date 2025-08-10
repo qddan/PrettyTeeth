@@ -1,0 +1,17 @@
+[build]
+  command = "chmod +x gradlew && ./gradlew build && mkdir -p dist && echo '<!DOCTYPE html><html><head><title>PrettyTeeth</title></head><body><h1>PrettyTeeth API</h1><p>Kotlin/Ktor backend is running. This is a backend API application.</p><p>For full functionality, please deploy to a JVM-compatible platform like Railway, Render, or Fly.io</p><pre>API Endpoints:\n/api/schedules - Schedule management\n/api/images - Image management\n/api/reminders - Reminder management</pre></body></html>' > dist/index.html"
+  publish = "dist/"
+
+[build.environment]
+  JAVA_VERSION = "17"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://prettyteeth-backend.railway.app/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
