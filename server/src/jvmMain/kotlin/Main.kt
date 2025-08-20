@@ -1,5 +1,18 @@
 package com.prettyteeth
 
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.request.*
+import kotlinx.serialization.json.Json
+import java.io.File
+import com.prettyteeth.repository.DataRepository
+import com.prettyteeth.routes.configureApiRoutes
+
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {

@@ -28,6 +28,12 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            embedBitcode = org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.DISABLE
+        }
+        iosTarget.compilations.getByName("main") {
+            cinterops {
+                // Add any required native interops here if needed
+            }
         }
     }
     
