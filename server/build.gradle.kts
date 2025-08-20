@@ -5,8 +5,9 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
+    
     jvm {
-        jvmToolchain(17)
         withJava()
     }
     
@@ -30,12 +31,7 @@ kotlin {
     }
 }
 
-application {
-    mainClass.set("com.prettyteeth.MainKt")
-    
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
+// Application configuration moved to ktor plugin
 
 ktor {
     fatJar {

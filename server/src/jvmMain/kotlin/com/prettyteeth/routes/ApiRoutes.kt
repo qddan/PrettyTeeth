@@ -2,20 +2,112 @@ package com.prettyteeth.routes
 
 import com.prettyteeth.models.*
 import com.prettyteeth.repository.DataRepository
+import com.prettyteeth.shared.models.*
+import com.prettyteeth.shared.repository.DentalRepository
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+// Removed kotlinx.datetime imports - not needed for basic API
 import java.io.File
 import java.util.*
 
 fun Application.configureApiRoutes(repository: DataRepository) {
+    val dentalRepository = DentalRepository()
+    
     routing {
+        
+        // ========== DENTAL CARE ENDPOINTS ==========
+        
+        // Lấy danh sách cuộc hẹn sắp tới
+        get("/api/appointments") {
+            val appointments = dentalRepository.getUpcomingAppointments()
+            call.respond(appointments)
+        }
+        
+        // Tạo cuộc hẹn mới
+        post("/api/appointments") {
+            try {
+                val appointment = call.receive<Appointment>()
+                // TODO: Save to database
+                call.respond(HttpStatusCode.Created, mapOf(
+                    "success" to true,
+                    "message" to "Đã tạo cuộc hẹn thành công",
+                    "appointment" to appointment
+                ))
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, mapOf(
+                    "success" to false,
+                    "message" to "Lỗi: ${e.message}"
+                ))
+            }
+        }
+        
+        // Lấy thông tin bệnh nhân
+        get("/api/patients/{patientId}") {
+            val patientId = call.parameters["patientId"]
+            if (patientId != null) {
+                val patient = dentalRepository.getPatientInfo()
+                call.respond(patient)
+            } else {
+                call.respond(HttpStatusCode.BadRequest, mapOf(
+                    "success" to false,
+                    "message" to "Thiếu patient ID"
+                ))
+            }
+        }
+        
+        // Lấy lịch sử điều trị
+        get("/api/treatments/{patientId}") {
+            val patientId = call.parameters["patientId"]
+            if (patientId != null) {
+                val treatments = dentalRepository.getTreatmentHistory()
+                call.respond(treatments)
+            } else {
+                call.respond(HttpStatusCode.BadRequest, mapOf(
+                    "success" to false,
+                    "message" to "Thiếu patient ID"
+                ))
+            }
+        }
+        
+        // Thêm điều trị mới
+        post("/api/treatments") {
+            try {
+                val treatment = call.receive<Treatment>()
+                // TODO: Save to database
+                call.respond(HttpStatusCode.Created, mapOf(
+                    "success" to true,
+                    "message" to "Đã thêm điều trị thành công",
+                    "treatment" to treatment
+                ))
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, mapOf(
+                    "success" to false,
+                    "message" to "Lỗi: ${e.message}"
+                ))
+            }
+        }
+        
+        // Lấy mẹo chăm sóc răng
+        get("/api/dental-tips") {
+            val tips = dentalRepository.getDentalTips()
+            call.respond(tips)
+        }
+        
+        // Lấy mẹo theo category
+        get("/api/dental-tips/{category}") {
+            val category = call.parameters["category"]
+            val tips = dentalRepository.getDentalTips()
+            val filteredTips = if (category != null) {
+                tips.filter { it.category.name.lowercase() == category.lowercase() }
+            } else {
+                tips
+            }
+            call.respond(filteredTips)
+        }
         
         // ========== SCHEDULE ENDPOINTS ==========
         
